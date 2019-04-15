@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <title>属性查询</title>
+    <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <link href="./css/pretty.css" rel="stylesheet">
+    <script src="./js/jquery.min.js"></script>
+    <script src="./js/config.js"></script>
+    <script type="text/javascript" src="./js/require.min.js" data-main="js/main"></script>
+</head>
+<body>
+<div id="cesiumContainer"></div>
+<div id='loadingbar' class="spinner">
+    <div class="spinner-container container1">
+        <div class="circle1"></div>
+        <div class="circle2"></div>
+        <div class="circle3"></div>
+        <div class="circle4"></div>
+    </div>
+    <div class="spinner-container container2">
+        <div class="circle1"></div>
+        <div class="circle2"></div>
+        <div class="circle3"></div>
+        <div class="circle4"></div>
+    </div>
+    <div class="spinner-container container3">
+        <div class="circle1"></div>
+        <div class="circle2"></div>
+        <div class="circle3"></div>
+        <div class="circle4"></div>
+    </div>
+</div>
+<blockquote id="bubble" class="bubble">
+    <img id="myimg" src="./images/home_banner.jpg" width="50%" height="auto">
+
+    <h2 id="title"></h2>
+    <p id="des" class="word"></p>
+
+    <audio controls="controls">
+    <source src="./media/song.mp3" type="audio/mpeg" />
+    Your browser does not support the audio tag.
+    </audio>
+
+    <!--<table border=1, cellpadding="2" ,cellspacing="2">-->
+        <!--<tr>-->
+            <!--<td><font color="#0000FF">编号</font></td>-->
+            <!--<td><font color="#0000FF">测站编号</font></td>-->
+            <!--<td><font color="#0000FF">测站类型</font></td>-->
+        <!--</tr>-->
+        <!--<tr>-->
+            <!--<td><font color="#0000FF">title </font></td>-->
+            <!--<td><font color="#0000FF">title</font></td>-->
+            <!--<td><font color="#0000FF">测试</font></td>-->
+        <!--</tr>-->
+    <!--</table>-->
+
+
+</blockquote>
+<script type="text/javascript">
+    function onload(Cesium) {
+        var infoboxContainer = document.getElementById("bubble");
+        //初始化viewer部件
+        var viewer = new Cesium.Viewer('cesiumContainer');
+
+        //Bing地图
+        viewer.imageryLayers.addImageryProvider(new Cesium.BingMapsImageryProvider({
+            url: 'https://dev.virtualearth.net',
+            mapStyle: Cesium.BingMapsStyle.AERIAL,
+            key: URL_CONFIG.BING_MAP_KEY
+        }));
+
+        // viewer.imageryProvider.addImageryProvider( new Cesium.TiandituImageryProvider({
+        //     credit : new Cesium.Credit('天地图全球影像服务     数据来源：国家地理信息公共服务平台 & 四川省测绘地理信息局'),
+        //     url:"http://[subdomain].tianditu.com/img_w/wmts?tk=a0e1ab8e059013e9c6f5d5104aa6c868"
+        // }));
+
+        //天地图
+        // viewer.imageryLayers.addImageryProvider(new Cesium.TiandituImageryProvider({
+        //     credit: new Cesium.Credit('天地图全球影像服务     数据来源：国家地理信息公共服务平台 & 四川省测绘地理信息局'),
+        //     url: "http://[subdomain].tianditu.com/img_w/wmts?tk=a0e1ab8e059013e9c6f5d5104aa6c868"
+        // }));
+
+        var data = [{
+            "id": "0",
+            "no": "PK10",
+            "longitude": "114.0860343",
+            "latitude": "22.84700686",
+            "name": "排口10",
+            "type": "工业排口水质站",
+            "index": "NH3-N、TP、COD",
+            "ContainCamera": "true"
+        }, {
+            "id": "1",
+            "no": "PK11",
+            "longitude": "114.0845646",
+            "latitude": "22.84730334",
+            "name": "排口11",
+            "type": "工业排口水质站",
+            "index": "NH3-N、TP、COD",
+            "ContainCamera": "true"
+        }, {
+            "id": "2",
+            "no": "PK12",
+            "longitude": "114.0919024",
+            "latitude": "22.84617135",
+            "name": "排口12",
+            "type": "工业排口水质站",
+            "index": "NH3-N、TP、COD",
+            "ContainCamera": "true"
+        }, {
+            "id": "3",
+            "no": "OSZ27",
+            "longitude": "114.1025534",
+            "latitude": "22.84526158",
+            "name": "宝山水",
+            "type": "支流较重要水质站",
+            "index": "NH3-N、ORP、DO",
+            "ContainCamera": "true"
+        }, {
+            "id": "4",
+            "no": "ISZ4",
+            "longitude": "114.1107497",
+            "latitude": "22.84979062",
+            "name": "塘厦清溪交界",
+            "type": "重要水质站",
+            "index": "NH3-N、TP、COD、BOD5、ORP、DO、PH、T、SS、电导率、TN",
+            "ContainCamera": "true"
+        }, {
+            "id": "5",
+            "no": "SWZ6",
+            "longitude": "114.1133124",
+            "latitude": "22.84986877",
+            "name": "石马河塘厦清溪交界",
+            "type": "水位站",
+            "index": "NH3-N、TP、COD、BOD5",
+            "ContainCamera": "false"
+        }, {
+            "id": "6",
+            "no": "OSZ26",
+            "longitude": "114.106285",
+            "latitude": "22.8414984",
+            "name": "鸡爪河",
+            "type": "支流较重要水质站",
+            "index": "NH3-N、ORP、DO",
+            "ContainCamera": "true"
+        }, {
+            "id": "7",
+            "no": "GWb07-FL",
+            "longitude": "114.103246",
+            "latitude": "22.84304371",
+            "name": "管网监测站19",
+            "type": "管网流量监测站",
+            "index": "F、L",
+            "ContainCamera": "false"
+        }, {
+            "id": "8",
+            "no": "GWb07-Q",
+            "longitude": "114.103246",
+            "latitude": "22.84304371",
+            "name": "管网监测站20",
+            "type": "管网水质监测站",
+            "index": "TP、COD",
+            "ContainCamera": "false"
+        }, {
+            "id": "9",
+            "no": "GWb01-FL",
+            "longitude": "114.0642204",
+            "latitude": "22.7977208",
+            "name": "管网监测站19",
+            "type": "管网流量监测站",
+            "index": "F、L",
+            "ContainCamera": "false"
+        }, {
+            "id": "10",
+            "no": "GWb01-Q",
+            "longitude": "114.0642204",
+            "latitude": "22.7977208",
+            "name": "管网监测站20",
+            "type": "管网水质监测站",
+            "index": "TP、COD",
+            "ContainCamera": "false"
+        }, {
+            "id": "11",
+            "no": "GWb02-FL",
+            "longitude": "114.0680121",
+            "latitude": "22.79857322",
+            "name": "管网监测站21",
+            "type": "管网流量监测站",
+            "index": "F、L",
+            "ContainCamera": "false"
+        }, {
+            "id": "12",
+            "no": "GWb10-Q",
+            "longitude": "114.0657665",
+            "latitude": "22.79612208",
+            "name": "管网监测站33",
+            "type": "管网水质监测站",
+            "index": "TP、COD",
+            "ContainCamera": "false"
+        }, {
+            "id": "13",
+            "no": "NLZ05",
+            "longitude": "114.110756",
+            "latitude": "22.78475293",
+            "name": "凤清路",
+            "type": "内涝监测站",
+            "index": "雨量P、积水",
+            "ContainCamera": "true"
+        }, {
+            "id": "14",
+            "no": "WSC1",
+            "name": null,
+            "longitude": "114.1056245",
+            "latitude": "22.84278114",
+            "type": "污水厂",
+            "index": null,
+            "ContainCamera": "false"
+        }, {
+            "id": "15",
+            "no": "WSC2",
+            "name": null,
+            "longitude": "114.1052857",
+            "latitude": "22.84459797",
+            "type": "污水厂",
+            "index": null,
+            "ContainCamera": "false"
+        }
+        ]
+
+
+        // for(var j = 0;j < Object.keys(data[i]).length; j++){
+        //     // console.log(Object.keys(data[i])[j]);
+        //     // console.log(data[i][Object.keys(data[i])[j]]);
+        //     if (j==0){
+        //         var des = '<table class="cesium-infoBox-defaultTable"><tbody>' + '<tr><th>' + mapKeyValueObj[Object.keys(data[i])[j]] + '</th><td>' + data[i][Object.keys(data[i])[j]]  + '</td></tr>';
+        //     }
+        //     else if (j == Object.keys(data[i]).length-1 ){
+        //         des += '<tr><th>' + mapKeyValueObj[Object.keys(data[i])[j]]+ '</th><td>' + data[i][Object.keys(data[i])[j]]  + '</td></tr>' + "</tbody></table>";
+        //     }
+        //     else {
+        //         des += '<tr><th>' + mapKeyValueObj[Object.keys(data[i])[j]] + '</th><td>' + data[i][Object.keys(data[i])[j]]  + '</td></tr>';
+        //     }
+        // }
+
+
+//添加监测站点
+        for (var i = 0; i < data.length; i++) {
+
+            var str;
+            if (data[i]["type"].indexOf("工业排口水质站") != -1) {
+                str = "./images/GYPKSZ.png";
+            } else if (data[i]["type"].indexOf("重要水质") != -1) {
+                str = "./images/ZYSZ.png";
+            } else if (data[i]["type"].indexOf("水位") != -1) {
+                str = "./images/SW.png";
+            } else if (data[i]["type"].indexOf("管网流量监测站") != -1) {
+                str = "./images/GWLL.png";
+            } else if (data[i]["type"].indexOf("管网水质监测站") != -1) {
+                str = "./images/GWSZ.png";
+            } else if (data[i]["type"].indexOf("污水厂") != -1) {
+                str = "./images/WSC.png";
+            } else {
+                str = "./images/default.png";
+            }
+            // console.log(data[i]["id"]);
+            // console.log("打印id");
+
+//     //设置条件控制显隐 todo 后续用图层控制
+//     if(1 == 1){
+            if (data[i]["type"].indexOf("管网流量") == -1) {
+// if((data[i]["ContainCamera"] == "true")||(data[i]["type"] == "污水厂")){
+//
+// if (data[i]["ContainCamera"] == "true") {
+//     str = "./images/Camera.png";
+// }
+//     if (data[i]["type"] == "污水厂") {
+//         str = "./images/WSC.png";
+//     }
+
+
+//     // //添加监测站点
+                viewer.entities.add({
+                    id: parseFloat(data[i]["id"]),
+                    position: Cesium.Cartesian3.fromDegrees(parseFloat(data[i]["longitude"]), parseFloat(data[i]["latitude"]), 15),
+                    billboard: {
+                        // image: './images/location4.png',
+                        image: str,
+                        width: 50,
+                        height: 60,
+                        // horizontalOrigin : Cesium.HorizontalOrigin.CENTER,
+                        // verticalOrigin: Cesium.VerticalOrigin.TOP,
+                        // distanceDisplayCondition : new Cesium.DistanceDisplayCondition(0,2000),
+                        eyeOffset: new Cesium.Cartesian3(0.0, 0.0, -10)
+                        //scaleByDistance : new Cesium.NearFarScalar(1.5e2, 5.0, 1.5e7, 0.5),
+                    },
+                    label: {
+                        text: data[i]["name"],
+                        font: '18px Helvetica',
+                        fillColor: Cesium.Color.RED,
+                        outlineColor: Cesium.Color.BLACK,
+                        outlineWidth: 2,
+                        // //style : Cesium.LabelStyle.FILL_AND_OUTLINE,
+                        horizontalOrigin: Cesium.HorizontalOrigin.LEFT,
+                        verticalOrigin: Cesium.VerticalOrigin.TOP,
+                        backColor: "#FFFFFF",
+                        // distanceDisplayCondition : new Cesium.DistanceDisplayCondition(1000),
+                        // eyeOffset : new Cesium.Cartesian3(0.0,0.0, -5000),
+                    },
+                });
+            }
+
+
+        }
+
+        //  viewer.customInfobox = infoboxContainer;
+        var scene = viewer.scene;
+        var canvas = scene.canvas;
+        var widget = viewer.cesiumWidget;
+        $('#loadingbar').remove();
+
+        //添加天地图注记
+        var imageryLayers = viewer.imageryLayers;
+        var labelImagery = new Cesium.TiandituImageryProvider({
+            mapStyle: Cesium.TiandituMapsStyle.CIA_C,//天地图全球中文注记服务（经纬度投影）
+            url: "http://[subdomain].tianditu.com/cia_c/wmts?tk=a0e1ab8e059013e9c6f5d5104aa6c868"
+            // tk 来自http://lbs.tianditu.gov.cn/
+        });
+        imageryLayers.addImageryProvider(labelImagery);
+
+        //添加S3M图层服务
+        //倾斜摄影，数据存放到硬盘，需要插硬盘展示
+        // var promise_undergroundT = scene.open('http://www.localhost:8090/iserver/services/3D-qxsy/rest/realspace');
+
+        //    var promise_underground = scene.open('http://www.localhost:8090/iserver/services/3D-qxsy/rest/realspace');
+        // var promise_YX = scene.open('http://10.219.245.11:8090/iserver/services/3D-ShiMaHeChangJing/rest/realspace');
+
+        //正射影像
+        // var promise_YX = scene.open('http://10.219.245.11:8090/iserver/services/3D-ShiMaHeChangJing/rest/realspace');
+        // var selectedColor = Cesium.Color.fromCssColorString('#FFFFFF');
+        // Cesium.when(promise_YX, function (layers) {
+        //     var terrianLayer;
+        //     for (var i = 0; i < layers.length; i++) {
+        //         terrianLayer = viewer.imageryLayers.get(i);
+        //         terrianLayer.transperantBackColor = Cesium.Color.WHITE;
+        //         terrianLayer.transperantBackColorTolerance = 0.4;
+        //     }
+        // });
+
+        //加载kml
+        var options = {
+            camera: viewer.scene.camera,
+            canvas: viewer.scene.canvas,
+            //clampToGround: true //开启贴地
+            width: 10000
+        };
+        var a = viewer.dataSources.add(Cesium.KmlDataSource.load('./images/LY.kml', options));
+        var a = viewer.dataSources.add(Cesium.KmlDataSource.load('./images/宝山水系.kml', options));
+
+        //管网数据
+        // var promise = scene.open('http://www.localhost:8090/iserver/services/3D-scene/rest/realspace');
+        // var promise = scene.open('http://www.localhost:8090/iserver/services/3D-scene/rest/realspace');
+        var promise = scene.open('http://10.219.245.97:8090/iserver/services/3D-Scene/rest/realspace');
+
+        Cesium.when(promise, function (layers) {
+            if (!scene.pickPositionSupported) {
+                alert('不支持深度拾取,属性查询功能无法使用！');
+            }
+            // var testLayer = viewer.scene.layers.getSelectedLayer();
+            var testLayer = viewer.scene.layers;
+            console.log(testLayer);
+            console.log("*********************************************");
+            for (var i = 0; i < layers.length; i++) {
+                var strLayer = scene.layers.findByIndex(i).name;
+                var layer = scene.layers.find(strLayer);
+                var str_before = strLayer.split("@")[0];
+                //设置属性查询参数
+                layer.setQueryParameter({
+                    // url: 'http://www.localhost:8090/iserver/services/data-scene2/rest/data',
+                    // dataSourceName: 'pipe3DGIfObj',
+                    // // url: 'http://www.localhost:8090/iserver/services/data-scene/rest/data',
+                    // // dataSourceName: 'DGGW20190304',
+                    // // dataSetName: str_before,
+                    // dataSetName: "ZTT@pipe",
+                    // keyWord: 'SmID'
+                    url: 'http://10.219.245.97:8090/iserver/services/data-Scene/rest/data',
+                    // url: 'http://www.localhost:8090/iserver/services/data-scene/rest/data',
+                    // dataSourceName: 'DGGW20190304',
+                    dataSourceName: 'DGGW',
+                    dataSetName: str_before,
+                    // dataSetName: "ZTT@pipe",
+                    keyWord: 'SmID'
+                });
+            }
+            //
+            //     //设置相机视角
+            scene.camera.setView({
+                //将经度、纬度、高度的坐标转换为笛卡尔坐标
+                // destination : new Cesium.Cartesian3(-2767302.844416157,5085941.49155452,2675759.1559041184),
+                destination: new Cesium.Cartesian3.fromDegrees(114.088187283226630, 22.811399984796918, 400.0),
+                orientation: {
+                    heading: 4.7793869967010565,
+                    pitch: -0.5899023527373464,
+                    roll: 8.539835505416704e-12
+                }
+            });
+        });
+
+        // //拾取坐标位置
+        // var handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+        // //设置鼠标左键单击回调事件
+        // handler.setInputAction(function (e) {
+        //     //      //首先移除之前添加的点
+        //     //     viewer.entities.removeAll();
+        //     //      //获取点击位置笛卡尔坐标
+        //     var position = viewer.scene.pickPosition(e.position);
+        //     var pick = viewer.scene.pick(position, 10, 10);
+        //     var obj = viewer.scene._layers;
+        //     var obj2 = viewer.scene._layers.selectedEntity;
+        //
+        //     console.log("选择对象");
+        //     console.log(pick);
+        //     console.log(obj);
+        //     console.log(obj2);
+        //     var pick2 = viewer.scene._layers.getSelection();
+        //
+        //     console.log("**********选择的图层***********");
+        //     console.log(pick2);
+        //     console.log("**********选择的图层***********");
+        //
+        //     //      //将笛卡尔坐标转化为经纬度坐标
+        //     //      var cartographic = Cesium.Cartographic.fromCartesian(position);
+        //     //      var longitude = Cesium.Math.toDegrees(cartographic.longitude);
+        //     //      var latitude = Cesium.Math.toDegrees(cartographic.latitude);
+        //     //
+        //     //      console.log("拾取坐标位置")
+        //     //      console.log(longitude);
+        //     //      console.log(latitude);
+        //     //
+        //     //      var height = cartographic.height;
+        //     //      if(height < 0) {
+        //     //          height = 0;
+        //     //      }
+        //     //
+        //
+        // }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+        //创建描述位置的对话框
+        // function createDescription(Cesium,properties){
+        //     var simpleStyleIdentifiers = ['经度','纬度','高度'];
+        //     var html = '';
+        //     for ( var key in properties) {
+        //         if (properties.hasOwnProperty(key)) {
+        //             if (simpleStyleIdentifiers.indexOf(key) !== -1) {
+        //                 continue;
+        //             }
+        //             var value = properties[key];
+        //             if (Cesium.defined(value) && value !== '') {
+        //                 html += '<tr><td>' + simpleStyleIdentifiers[key] + '</td><td>' + value + '</td></tr>';
+        //             }
+        //         }
+        //     }
+        //     if (html.length > 0) {
+        //         html = '<table class="zebra"><tbody>' + html + '</tbody></table>';
+        //     }
+        //     return html;
+        // }
+
+        //添加自定义infobox
+        // var title = document.getElementById("title");
+        // var des = document.getElementById("des");
+        //  var myimg = document.getElementById("myimg");
+        //注册鼠标点击事件
+
+        // viewer._selectedEntityChanged.addEventListener(function(feature){
+        viewer.pickEvent.addEventListener(function (feature) {
+
+            // pickFeatures(winpos, scene)
+            console.log(feature);
+            console.log("测试点击查询管点属性");
+            console.log(scene._layers.getSelection());
+            console.log(feature.SMID);
+            var title = Cesium.defaultValue(feature.SMID, '');
+            var description = Cesium.defaultValue(feature.MNTPCD, '');
+            // title.innerText = title;
+            // des.innerText = description;
+            // myimg.src = "./images/" + title + ".jpg";
+        });
+    }
+</script>
+</body>
+</html>

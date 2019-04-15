@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+       
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <title>rest方式加载地图</title>
+    <script src="json_parse.js"></script>
+      
+    <script src="toJSON.js"></script>
+       
+    <script src="libs/SuperMap.Include.js"></script>
+       
+    <script src="dist/include-leaflet.js"></script>
+
+    <script type="text/javascript">
+        var map, layer, vectorLayer, control, selectFeature;
+        // 设置访问的GIS服务地址
+        // var url = "http://localhost:8090/iserver/services/map-ChinaTestWorkPlace/rest/maps/ChinaTest";
+        var url = "http://localhost:8090/iserver/services/map-DGGW/rest/maps/Map";
+
+        function GetMap() {
+            // 创建地图对象
+            map = new SuperMap.Map("map");
+            control = new SuperMap.Control.MousePosition();     //该控件显示鼠标移动时，所在点的地理坐标。
+            map.addControl(control);  //添加控件
+            // 创建图层对象
+            layer = new SuperMap.Layer.TiledDynamicRESTLayer("Map", url, {
+                transparent: true,
+                cacheEnabled: true
+            }, {maxResolution: "auto"});
+            layer.events.on({"layerInitialized": addLayer});
+
+            //TODO：方式二：
+            // // 初始化地图信息
+            // var map = L.map('map', {
+            //     crs: L.CRS.NonEarthCRS({
+            //         bounds: L.bounds([48.4, -7668.25],[8958.85, -55.58]),
+            //         origin: L.point(48.4,-55.58)
+            //     }),
+            //     center: [-4500, 4000],
+            //     maxZoom: 18,
+            //     zoom: 1
+            // });
+            //
+            // // 添加图层
+            // L.supermap.tiledMapLayer(url, {noWrap: true}).addTo(map);
+
+            //TODO:加载自己的地图
+            // // 定义地图投影
+            // var crs = L.Proj.CRS("EPSG:4326", {
+            //     origin: [114.10, 22.82],
+            //     scaleDenominators: [100000, 50000, 25000, 20000, 10000, 5000, 2000, 1000, 500, 200, 100, 50, 20, 1]
+            // });
+            //
+            // var xian80=Proj4js.defs("EPSG:2383","+proj=tmerc +lat_0=0 +lon_0=114 +k=1 +x_0=500000 +y_0=0 +a=6378140 +b=6356755.288157528 +units=m +no_defs");
+            // map = L.map('map', {
+            //     // crs: crs,
+            //     crs: xian80,
+            //     center: [114.10, 22.82],
+            //     // maxZoom: 18,
+            //     maxZoom: 20,
+            //     zoom: 1
+            // });
+            // L.supermap.tiledMapLayer(url,{noWrap: true}).addTo(map);
+
+        }
+
+        // 加载图层
+        function addLayer() {
+            // 向Map添加图层
+            map.addLayer(layer);
+            map.setCenter(new SuperMap.LonLat(114.10, 22.82), 1);
+        }
+
+
+    </script>
+</head>
+<body onload="GetMap()">   
+   
+<div id="map" style="height: 640px; width: 720px; border: 1px solid red; margin-left: auto; margin-right: auto;"></div>
+<!--<div id="map" style="height: 1920px; width: 1080px; border: 1px solid red; margin-left: auto; margin-right: auto;"></div>-->
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title data-i18n="resources.title_tiledMapLayerProj4"></title>
+    <script type="text/javascript" src="js/include-web.js"></script>
+</head>
+<body style=" margin: 0;overflow: hidden;background: #fff;width: 100%;height:100%;position: absolute;top: 0;">
+<div id="map" style="margin:0 auto;width: 100%;height: 100%"></div>
+<!--[if lte IE 8]>
+<script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=default-3.3&excludes=Event"></script>
+<![endif]-->
+<script type="text/javascript" src="dist/include-leaflet.js"></script>
+<script src="dist/proj4-src.js"></script>
+<script type="text/javascript" language="javascript" src="./js/proj4js/lib/proj4js-combined.js"></script>
+
+
+<script type="text/javascript">
+    var map;
+    var urlMap = "http://localhost:8090/iserver/services/map-DGGW/rest/maps/Map";
+
+    //TODO:方式三，leaflet方式
+    const resolutions = [
+        156367.7919628329
+        , 78183.89598141646
+        , 39091.94799070823
+        , 19545.973995354114
+        , 9772.986997677057
+        , 4886.4934988385285
+        , 2443.2467494192642
+        , 1221.6233747096321
+        , 610.8116873548161
+        , 305.40584367740803
+        , 152.70292183870401
+        , 76.35146091935201
+        , 38.175730459676004
+        , 19.087865229838002
+        , 9.543932614919001
+        , 4.7719663074595005
+        , 2.3859831537297502
+        , 1.1929915768648751
+        , 0.5964957884324376
+        , 0.2982478942162188
+    ];  // 0 19
+
+    //自定义投影坐标
+    // const CRS_2383 = new L.Proj.CRS('EPSG:2383', '+proj=tmerc +lat_0=0 +lon_0=114 +k=1 +x_0=500000 +y_0=0 +a=6378140 +b=6356755.288157528 +units=m +no_defs');
+    var origin = [114.10, 22.82];
+
+    // Proj4js.defs("EPSG:2383","+proj=tmerc +lat_0=0 +lon_0=114 +k=1 +x_0=500000 +y_0=0 +a=6378140 +b=6356755.288157528 +units=m +no_defs");
+
+    Proj4js.defs["EPSG:2383"] = "+proj=tmerc +lat_0=0 +lon_0=114 +k=1 +x_0=500000 +y_0=0 +a=6378140 +b=6356755.288157528 +units=m +no_defs";
+    var xian80=new SuperMap.Projection("EPSG:2383");
+
+    //leaflet CRS投影设置    // 定义地图投影
+    var crs =  L.Proj.CRS(xian80, {
+        origin: origin,
+        scaleDenominators: resolutions
+    });
+    // //leaflet CRS投影设置    // 定义地图投影
+    // var crs =  L.Proj.CRS("EPSG:2383", {
+    //     origin: origin,
+    //     scaleDenominators: resolutions
+    // });
+
+
+
+    map = L.map('map', {
+        crs: crs,
+        // crs: xian80,
+        // crs: CRS_2383,
+        center: [114.10, 22.82],
+        maxZoom: 1,
+        zoom: 0,
+    });
+    L.supermap.tiledMapLayer(urlMap).addTo(map);
+</script>
+</body>
+</html>

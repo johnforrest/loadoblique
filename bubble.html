@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <title>分层分户查询</title>
+    <link href="./Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <link href="./css/pretty.css" rel="stylesheet">
+    <script src="./js/jquery.min.js"></script>
+    <script src="./js/config.js"></script>
+    <script type="text/javascript" src="./js/require.min.js" data-main="js/main"></script>
+</head>
+
+<body class="loading">
+
+<div id="cesiumContainer"></div>
+<div id="toolbar" class="param-container tool-bar">
+    <label style="font: 400 13.3333px Arial;">对象名称</label><input type="text" id="objName">
+    <button type="button" id="search" class="button black">查询</button>
+    <br>
+</div>
+
+<div id="bubble" class="bubble" style="bottom:0;left:82%;display:none;width: 400px">
+    <div id="tools" style="text-align : right">
+        <span style="color: rgb(95, 74, 121);padding: 5px;position: absolute;left: 10px;top: 4px;">对象属性</span>
+        <span class="fui-export" id="bubblePosition" style="color: darkgrey; padding:5px" title="停靠"></span>
+        <span class="fui-cross" title="关闭" id="close" style="color: darkgrey;padding:5px"></span>
+    </div>
+    <div style="overflow-y:scroll;height:190px" id="tableContainer">
+        <table id="tab"></table>
+    </div>
+</div>
+<script>
+    function onload(Cesium) {
+        var viewer = new Cesium.Viewer('cesiumContainer');
+        var scene = viewer.scene;
+
+        scene.screenSpaceCameraController.enableIndoorColliDetection = true;
+        var infoboxContainer = document.getElementById("bubble");
+        //viewer.customInfobox = infoboxContainer;
+
+        var widget = viewer.cesiumWidget;
+        var IDs = [];
+        $('#loadingbar').remove();
+        try {
+            var promise = scene.open('http://support.supermap.com.cn:8090/iserver/services/3D-CBD/rest/realspace');
+            // var promise = scene.open('http://strongit.imwork.net:58090/iserver/services/3D-fctest/rest/realspace');
+            Cesium.when(promise, function (layer) {
+                //设置相机位置、视角，便于观察场景
+                scene.camera.setView({
+                    destination : new Cesium.Cartesian3.fromDegrees(116.4566,39.9149,5323.445971240632),
+                    // destination: new Cesium.Cartesian3.fromDegrees(113.544227628755, 23.5697403337312, 1000),
+                    //destination : new Cesium.Cartesian3.fromDegrees("${lon}","${lat}"),
+                    orientation: {
+                        heading: 3.1612,
+                        pitch: -1.5188,
+                        roll: 6.283185307179563
+                    }
+                });
+                var camera = scene.camera;
+
+            }, function () {
+                var title = '加载SCP失败，请检查网络连接状态或者url地址是否正确？';
+                widget.showErrorPanel(title, undefined, e);
+            });
+        } catch (e) {
+            if (widget._showRenderLoopErrors) {
+                var title = '渲染时发生错误，已停止渲染。';
+                widget.showErrorPanel(title, undefined, e);
+            }
+        }
+        $("#search").click(function () {
+            doQuery();
+        });
+
+        function doQuery() {
+            var descriptionHTML = '<table class="cesium-infoBox-defaultTable"><tbody>';
+            descriptionHTML += "</tbody></table>";
+            var entity = viewer.entities.add({ //向实体集合添加一个实体对象。
+                //向用户显示的可读名称，名称可不必唯一。
+                name: "TEST",
+                //实体的位置。
+                position: new Cesium.Cartesian3.fromDegrees(113.54422, 23.5697403, 200),
+                //与此实体关联的广告牌。
+                billboard: {
+                    image: './images/location4.png',
+                    width: 30,
+                    height: 40
+                },
+                //实体的HTML描述。
+                description: descriptionHTML
+            });
+            viewer.flyTo(entity);
+        }
+
+
+        var table = document.getElementById("tab");
+        var handler3D = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+
+        //绑定鼠标单击
+        handler3D.setInputAction(function (movement) {
+            var pick = scene.pick(movement.position);
+            if (pick && pick.id) {
+
+                $("#bubble").show();
+                for (var i = table.rows.length - 1; i > -1; i--) {
+                    table.deleteRow(i);
+                }
+
+                var newRow = table.insertRow();
+                var cell1 = newRow.insertCell();
+                var cell2 = newRow.insertCell();
+                cell1.innerHTML = "测试1";
+                cell2.innerHTML = "测试内容1";
+            } else {
+                $('#bubble').hide();
+            }
+
+        }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+        //绑定地图移动
+//      handler3D.setInputAction(function (movement) {
+//          $('#bubble').hide();
+//      }, Cesium.ScreenSpaceEventType.LEFT_UP);
+        //绑定地图缩放
+        handler3D.setInputAction(function (movement) {
+            $('#bubble').hide();
+        }, Cesium.ScreenSpaceEventType.WHEEL);
+        //绑定滚轮点击事件
+        handler3D.setInputAction(function (movement) {
+            $('#bubble').hide();
+        }, Cesium.ScreenSpaceEventType.MIDDLE_DOWN);
+
+        $("#bubblePosition").click(function () {
+            if ($("#bubblePosition").hasClass("fui-export")) {
+                viewer.customInfobox = undefined;
+                $("#bubble").removeClass("bubble").addClass("float");
+                $("#bubblePosition").removeClass("fui-export").addClass("fui-bubble");
+                $("#bubblePosition")[0].title = "悬浮";
+                $("#bubble").css({'left': '82%', 'bottom': '45%'});
+                $("#tableContainer").css({'height': '350px'});
+            } else if ($("#bubblePosition").hasClass("fui-bubble")) {
+                $("#bubble").removeClass("float").addClass("bubble");
+                $("#bubblePosition").removeClass("fui-bubble").addClass("fui-export");
+                $("#bubblePosition")[0].title = "停靠";
+                $("#tableContainer").css({'height': '150px'});
+                viewer.customInfobox = infoboxContainer;
+            }
+        });
+        $("#close").click(function () {
+            $("#bubble").hide();
+        });
+
+    }
+
+</script>
+</body>
+</html>

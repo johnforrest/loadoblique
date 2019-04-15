@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@supermap/iclient-classic": "^9.1.1",
+    "axios": "^0.18.0"
+  }
+}

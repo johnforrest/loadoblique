@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <title>倾斜摄影scp文件</title>
+    <link href="./Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <link href="./css/pretty.css" rel="stylesheet">
+    <script src="./js/jquery.min.js"></script>
+    <script src="./js/config.js"></script>
+	<script type="text/javascript" src="./js/require.min.js" data-main="js/main"></script>
+</head>
+<body>
+<div id="cesiumContainer"></div>
+<div id='loadingbar' class="spinner">
+    <div class="spinner-container container1">
+        <div class="circle1"></div>
+        <div class="circle2"></div>
+        <div class="circle3"></div>
+        <div class="circle4"></div>
+    </div>
+    <div class="spinner-container container2">
+        <div class="circle1"></div>
+        <div class="circle2"></div>
+        <div class="circle3"></div>
+        <div class="circle4"></div>
+    </div>
+    <div class="spinner-container container3">
+        <div class="circle1"></div>
+        <div class="circle2"></div>
+        <div class="circle3"></div>
+        <div class="circle4"></div>
+    </div>
+</div>
+<blockquote id="bubble" class="bubble">
+        <img id="myimg" src="./images/home_banner.jpg" width="50%" height="auto">
+        <h2 id="title"></h2>
+        <p id="des" class="word"></p>
+        <audio controls="controls">
+          <source src="./media/song.mp3" type="audio/mpeg" />
+            Your browser does not support the audio tag.
+        </audio>
+</blockquote>
+<script type="text/javascript">
+    function onload(Cesium) {
+        var infoboxContainer = document.getElementById("bubble");
+        //Initializing viewer
+        var viewer = new Cesium.Viewer('cesiumContainer',{
+            imageryProvider: new Cesium.BingMapsImageryProvider({
+                url : 'https://dev.virtualearth.net',
+                mapStyle : Cesium.BingMapsStyle.AERIAL,
+                key : URL_CONFIG.BING_MAP_KEY
+            })
+        });
+
+
+        viewer.customInfobox = infoboxContainer;
+        var scene = viewer.scene;
+        var canvas = scene.canvas;
+        var widget = viewer.cesiumWidget;
+        $('#loadingbar').remove();
+        try {
+            // Add S3M layer
+
+            // var promise = scene.addS3MTilesLayerByScp(URL_CONFIG.SCP_JINJIANG, {
+            //     name: 'jinjiang'
+            // });
+            // var promise = scene.addS3MTilesLayerByScp("http://10.219.245.97:8090/iserver/services/3D-dgqxsy0307/rest/realspace/datas/S3mConfig/config", {name:'S3mConfig'});
+            // var promise = scene.open("http://10.219.245.97:8090/iserver/services/3D-dgqxsy0307/rest/realspace/datas/S3mConfig/config");
+            // var promise = scene.open("http://10.219.245.97:8090/iserver/services/3D-dgqxsy0307/rest/realspace");
+            // var promise = scene.open("http://10.219.245.97:8090/iserver/services/3D-Scene3/rest/realspace");
+            //TODO:测试1 专题图s3m
+            // var promise = scene.open("http://localhost:8090/iserver/services/3D-yw0/rest/realspace");
+            //TODO：测试2 专题图s3m，矢量数据集s3mbz
+            // var promise = scene.open("http://localhost:8090/iserver/services/3D-yw/rest/realspace");
+            //TODO：测试3 专题图s3mbz
+            // var promise = scene.open("http://localhost:8090/iserver/services/3D-ys0/rest/realspace");
+            //TODO：测试3.1 专题图s3m
+            // var promise = scene.open("http://localhost:8090/iserver/services/3D-ys00/rest/realspace");
+            //TODO：测试4
+            // var promise = scene.open("http://localhost:8090/iserver/services/3D-ys/rest/realspace");
+
+            //TODO：测试5
+            var promise = scene.open("http://localhost:8090/iserver/services/3D-Scene2/rest/realspace");
+            // var promise = scene.open("http://11.125.1.17:8090/iserver/services/3D-Scene2/rest/realspace");
+
+
+            Cesium.when(promise, function (layers) {
+                if(!scene.pickPositionSupported){
+                    alert('不支持深度拾取,属性查询功能无法使用!');
+                }
+                // var layer = scene.layers.find('S3mConfig');
+                // //set Query parameter
+                // layer.setQueryParameter({
+                //     // url: 'http://www.supermapol.com/realspace/services/data-jinjiang/rest/data',
+                //     url: 'http://10.219.245.97:8090/iserver/services/3D-dgqxsy0307/rest/data',
+                //     dataSourceName: 'S3mConfig',
+                //     dataSetName: 'test',
+                //     keyWord: 'SmID'
+                // });
+
+                // 1. 飞向通过top-down视图表示的位置
+                viewer.camera.flyTo({
+                    destination : Cesium.Cartesian3.fromDegrees(114.09, 22.8, 2500.0)
+                });
+
+                var testLayer = viewer.scene.layers;
+                console.log(testLayer);
+                console.log("*********************************************");
+                for (var i = 0; i < layers.length; i++) {
+                    var strLayer = scene.layers.findByIndex(i).name;
+                    var layer = scene.layers.find(strLayer);
+                    var str_before = strLayer.split("@")[0];
+                    //设置属性查询参数
+                    layer.setQueryParameter({
+                        // url: 'http://www.localhost:8090/iserver/services/data-scene2/rest/data',
+                        // dataSourceName: 'pipe3DGIfObj',
+                        // // url: 'http://www.localhost:8090/iserver/services/data-scene/rest/data',
+                        // // dataSourceName: 'DGGW20190304',
+                        // // dataSetName: str_before,
+                        // dataSetName: "ZTT@pipe",
+                        // keyWord: 'SmID'
+                        url: 'http://10.219.245.97:8090/iserver/services/data-Scene/rest/data',
+                        // url: 'http://www.localhost:8090/iserver/services/data-scene/rest/data',
+                        // dataSourceName: 'DGGW20190304',
+                        dataSourceName: 'DGGW',
+                        dataSetName: str_before,
+                        // dataSetName: "ZTT@pipe",
+                        keyWord: 'SmID'
+                    });
+                }
+                //Set camera view
+               scene.camera.setView({
+                    //Convert the coordinates of longitude, latitude, and altitude to Cartesian coordinates
+                    // destination : new Cesium.Cartesian3(-2767302.844416157,5085941.49155452,2675759.1559041184),
+                    destination : new Cesium.Cartesian3(511784,2521101,0),
+                    orientation : {
+                       heading : 4.7793869967010565,
+                       pitch : -0.5899023527373464,
+                       roll : 8.539835505416704e-12
+                   }
+                });
+
+
+            }, function (e) {
+                if (widget._showRenderLoopErrors) {
+                    var title = 'An error occurred while rendering.  Rendering has stopped.';
+                    widget.showErrorPanel(title, undefined, e);
+                }
+            });
+        }
+        catch (e) {
+            if (widget._showRenderLoopErrors) {
+                var title = 'An error occurred while rendering.  Rendering has stopped.';
+                widget.showErrorPanel(title, undefined, e);
+            }
+        }
+        //Add a custom infobox
+        var title = document.getElementById("title");
+        var des = document.getElementById("des");
+        var myimg = document.getElementById("myimg");
+        //Register a mouse click event
+        viewer.pickEvent.addEventListener(function(feature){
+            var title = Cesium.defaultValue(feature.NAME,'');
+            var description = Cesium.defaultValue(feature.DES,'');
+            title.innerText = title;
+            des.innerText = description;
+            myimg.src = "./images/" + title + ".jpg";
+        });
+
+    }
+</script>
+</body>
+</html>
