@@ -6,13 +6,14 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
     <title>二三维一体化</title>
-    <script type="text/javascript" src="mapresource/libs/SuperMap.Include.js"></script>
+    <!--<script type="text/javascript" src="mapresource/libs/SuperMap.Include.js"></script>-->
     <link href="./Build/Cesium/Widgets/widgets.css" rel="stylesheet">
     <script src="./js/config.js"></script>
     <link href="./css/pretty.css" rel="stylesheet">
     <script src="./js/jquery.min.js"></script>
     <script type="text/javascript" src="./js/require.min.js" data-main="js/main"></script>
-    <script src="./js/supermap/SuperMap-7.1-11828.js"></script>
+    <!--<script src="./js/supermap/SuperMap-7.1-11828.js"></script>-->
+    <script src="js/supermap/SuperMap.Include.js"></script>
 
     <style>
         html, body {
@@ -111,7 +112,8 @@
         var widget = viewer.cesiumWidget;
         // 飞向通过top-down视图表示的位置
         scene.camera.flyTo({
-            destination: Cesium.Cartesian3.fromDegrees(114.10, 22.82, 100.0)
+            // destination: Cesium.Cartesian3.fromDegrees(114.10, 22.82, 100.0)
+            destination: Cesium.Cartesian3.fromDegrees(0, 0, 100)
         });
 
         // //二维地图初始化
@@ -135,9 +137,16 @@
             transparent: true,
             cacheEnabled: true
         }, {maxResolution: "auto"});
-        layer.events.on({"layerInitialized": addLayer});
+        layer.events.on({"layerInitialized": addLayer3});
 
 
+        function addLayer3() {
+            map.addLayers([layer]);
+            map.setCenter(new SuperMap.LonLat(0, 0), 0);
+            // map.setCenter(new SuperMap.LonLat(114.10, 22.82), 1);
+
+
+        }
 
         function addLayer() {
             layerMap = new SuperMap.Layer.TiledDynamicRESTLayer("Map", urlMap, {
@@ -153,8 +162,8 @@
 
         function addLayer2() {
             map.addLayers([layer,layerMap]);
-            // map.setCenter(new SuperMap.LonLat(0, 0), 0);
-            map.setCenter(new SuperMap.LonLat(114.10, 22.82), 1);
+            map.setCenter(new SuperMap.LonLat(0, 0), 0);
+            // map.setCenter(new SuperMap.LonLat(114.10, 22.82), 1);
         }
 
         $('#loadingbar').remove();
@@ -167,14 +176,14 @@
             //添加地图监听事件
             layer.events.on({"moveend": MaptoScene});
             //移除场景鼠标事件
-            handler.removeInputAction(Cesium.ScreenSpaceEventType.MOUSE_MOVE);
-            handler.removeInputAction(Cesium.ScreenSpaceEventType.WHEEL);
+            // handler.removeInputAction(Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+            // handler.removeInputAction(Cesium.ScreenSpaceEventType.WHEEL);
 
         };
         //三维联动二维
         scenePan = function () {
             //注销地图监听事件
-            layer.events.unregister("moveend", undefined, MaptoScene);
+            // layer.events.unregister("moveend", undefined, MaptoScene);
             handler.setInputAction(function (movement) {
                 var camera = viewer.scene.camera;
                 var cameraPosiion = camera.position;
@@ -187,7 +196,7 @@
                 //设置地图显示范围
                 var bounds = new SuperMap.Bounds(longitude - size, latitude - size, longitude + size, latitude + size);
                 map.zoomToExtent(bounds, false);
-            }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+            }, Cesium.ScreenSpaceEventType.MOUSE_MOVE&&Cesium.ScreenSpaceEventType.LEFT_DOWN);
             //添加场景鼠标事件
             handler.setInputAction(function (movement) {
                 var camera = viewer.scene.camera;
