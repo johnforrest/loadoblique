@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title></title>
+    <!--<script src="json_parse.js"></script>-->
+    <!--<script src="toJSON.js"></script>-->
+    <!--<script src="libs/SuperMap.Include.js"></script>-->
+    <script src="./js/supermap/SuperMap.Include.js"></script>
+
+    <script type="text/javascript">
+        var map, layer, vectorLayer, control, selectFeature;
+        // 设置访问的GIS服务地址
+        // var url = "http://localhost:8090/iserver/services/map-ChinaTestWorkPlace/rest/maps/ChinaTest";
+        var url="http://10.219.245.128:8090/iserver/services/map-BSS0518/rest/maps/Map";
+
+        function GetMap() {
+            // 创建地图对象
+            map = new SuperMap.Map("map");
+
+            control = new SuperMap.Control.MousePosition();     //该控件显示鼠标移动时，所在点的地理坐标。
+            map.addControl(control);  //添加控件
+
+            // 创建图层对象
+            layer = new SuperMap.Layer.TiledDynamicRESTLayer("World", url, {
+                transparent: true,
+                cacheEnabled: true
+            }, {maxResolution: "auto"});
+            layer.events.on({"layerInitialized": addLayer});
+        }
+
+        // 加载图层
+        function addLayer() {
+            // 向Map添加图层
+            map.addLayer(layer);
+            // map.setCenter(new SuperMap.LonLat(116.409749, 39.912344), 1);
+            map.setCenter(new SuperMap.LonLat(508120.43, 2522153.87), 1);
+        }
+    </script>
+</head>
+<body onload="GetMap()">
+<div id="map" style="height: 640px; width: 720px; border: 1px solid red; margin-left: auto; margin-right: auto;"></div>
+</body>
+</html>
