@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title data-i18n="resources.title_tiledMapLayer4326"></title>
+
+<script type="text/javascript" src="./js/include-web.js"></script>
+</head>
+<body style=" margin: 0;overflow: hidden;background: #fff;width: 100%;height:100%;position: absolute;top: 0;">
+<div id="map" style="margin:0 auto;width: 100%;height: 100%"></div>
+<script type="text/javascript" src="./dist/include-leaflet.js"></script>
+<script type="text/javascript">
+    var host = window.isLocal ? window.server : "http://support.supermap.com.cn:8090";
+    var map, url = host + "/iserver/services/map-world/rest/maps/World";
+
+    Proj4js.defs("EPSG:4547","+proj=tmerc +lat_0=0 +lon_0=114 +k=1 +x_0=500000 +y_0=0 +ellps=GRS80 +units=m +no_defs");
+    var crs=L.Proj.CRS('EPSG:4547',{
+        origin:[501624.62,2529101.48],
+		//bounds: L.bounds([962011.0113608096, 3563177.9015562125], [964016.4424569999, 3565934.8851109752]),
+        //resolutions:[10.76946701093766, 5.38473350546883, 2.692366752734415, 1.3461833763672075, 0.6730916881836038, 0.3365458440918019, 0.16827292204590094, 0.08413646102295047, 0.042068230511475235, 0.021034115255737618, 0.010517057627868809, 0.005258528813934404, 0.002629264406967202, 0.001314632203483601, 0.0006573161017418006, 0.0003286580508709003]
+        scaleDenominators: [500000,100000,50000,10000,5000,1000]
+    })
+    map = L.map('map', {
+        crs: crs,
+        center: [22.86061258367583,114.01583025949601],
+        maxZoom: 5,
+        zoom: 0
+    });
+    L.supermap.tiledMapLayer('http://10.219.245.128:8090/iserver/services/map-BSS0518/rest/maps/Map').addTo(map);
+
+</script>
+</body>
+</html>
