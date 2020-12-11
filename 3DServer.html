@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <title>属性查询</title>
+    <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <link href="./css/pretty.css" rel="stylesheet">
+    <script src="./js/jquery.min.js"></script>
+    <script src="./js/slider.js"></script>
+    <script src="./js/config.js"></script>
+    <script type="text/javascript" src="./js/require.min.js" data-main="js/main"></script>
+    <style>
+        .drawCur{
+            cursor: url(./images/cur/draw.cur), auto;
+        }
+        #excavation {
+            color:rgb(255, 255, 255);
+            font-size:14px;padding-top:4px;padding-bottom:4px;padding-left:33px;padding-right:33px;
+            border-width:2px;border-color:rgb(74, 99, 31);border-style:solid;border-radius:11px;
+            background-color:rgb(44, 89, 128);}
+        #excavation:hover{color:#ffffff;background-color:#78c300;border-color:#c5e591;}
+    </style>
+</head>
+<body>
+<div id="cesiumContainer"></div>
+<div id="bubble" class="bubble" style="bottom:0;left:82%;display:none;width: 400px" >
+    <div id="tools" style="text-align : right">
+        <span  style="color: rgb(95, 74, 121);padding: 5px;position: absolute;left: 10px;top: 4px;">对象属性</span>
+        <!--<span  style="color: rgb(95, 74, 121);padding: 5px;position: absolute;left: 10px;top: 4px;">对象属性</span>-->
+        <span class="fui-export" id="bubblePosition" style="color: darkgrey; padding:5px" title="停靠"></span>
+        <span  class="fui-cross" title="关闭" id="close" style="color: darkgrey;padding:5px"></span>
+    </div>
+    <div style="overflow-y:scroll;height:190px" id="tableContainer"><table id="tab"></table></div>
+</div>
+<script>
+    function onload(Cesium) {
+        var viewer = new Cesium.Viewer('cesiumContainer');
+        var scene = viewer.scene;
+        var globe = viewer.scene.globe;
+
+        viewer.scene.undergroundMode = true; //设置开启地下场景
+        viewer.scene.screenSpaceCameraController.minimumZoomDistance = -1000;//设置相机最小缩放距离,距离地表-1000米
+        viewer.scene.terrainProvider.isCreateSkirt = false; // 关闭裙边
+
+        var infoboxContainer = document.getElementById("bubble");
+        viewer.customInfobox = infoboxContainer;
+
+        // 添加场景模型
+        // var promise_underground = scene.open('http://localhost:8090/iserver/services/3D-ZCScene20190909/rest/realspace');
+        var promise_underground = scene.open('http://10.219.242.128:8090/iserver/services/3D-dg7zxz/rest/realspace');
+        Cesium.when(promise_underground, function(layers) {
+            var overGroundLayer = scene.layers.find('Config');
+
+            for (let i = 0; i < layers.length; i++) {
+                // var tempDatasetName = scene.layers.findByIndex(i).name;
+                // var tempDatasetName = scene.layers.findByIndex(i)._name;
+                var tempLayerName = layers[i]._name;
+                var tempLayer = scene.layers.find(tempLayerName);
+                var tempDatasetName = tempLayerName.split("@")[0];
+                //设置属性查询参数
+                tempLayer.setQueryParameter({
+                    url: 'http://10.219.242.128:8090/iserver/services/data-DG7ZXZ/rest/data',
+                    dataSourceName: 'DG7ZXZ',
+                    dataSetName: tempDatasetName,
+                    keyWord: 'SmID'
+                });
+            }
+            var table = document.getElementById("tab");
+            viewer.pickEvent.addEventListener(function(feature){
+                $("#bubble").show();
+                for (var i = table.rows.length-1; i > -1; i--){
+                    table.deleteRow(i);
+                }
+                var row0 = table.insertRow();
+                var cel0 = row0.insertCell();
+                var cel1 = row0.insertCell();
+                cel0.innerHTML = "字段"
+                cel1.innerHTML = "属性"
+                var edgeID = 0;
+                for(var key in feature ){
+                    var newRow = table.insertRow();
+                    var cell1 = newRow.insertCell();
+                    var cell2 = newRow.insertCell();
+                    cell1.innerHTML = key;
+                    cell2.innerHTML = feature[key];
+                }
+            });
+        });
+
+
+
+        var promise_underground = scene.open('http://10.219.242.128:8090/iserver/services/3D-ZCScene20190909/rest/realspace');
+        Cesium.when(promise_underground, function(layers){
+            var overGroundLayer = scene.layers.find('Config');
+
+            for (let i = 0; i < layers.length; i++) {
+                // var tempDatasetName = scene.layers.findByIndex(i).name;
+                // var tempDatasetName = scene.layers.findByIndex(i)._name;
+                var tempLayerName = layers[i]._name;
+                var tempLayer = scene.layers.find(tempLayerName);
+                var tempDatasetName = tempLayerName.split("@")[0];
+                //设置属性查询参数
+                tempLayer.setQueryParameter({
+                    url: 'http://10.219.242.128:8090/iserver/services/data-ZC20190909/rest/data',
+                    dataSourceName: 'ZC20190909',
+                    dataSetName: tempDatasetName,
+                    keyWord: 'SmID'
+                });
+            }
+            var table = document.getElementById("tab");
+            viewer.pickEvent.addEventListener(function(feature){
+                $("#bubble").show();
+                for (var i = table.rows.length-1; i > -1; i--){
+                    table.deleteRow(i);
+                }
+                var row0 = table.insertRow();
+                var cel0 = row0.insertCell();
+                var cel1 = row0.insertCell();
+                cel0.innerHTML = "字段"
+                cel1.innerHTML = "属性"
+                var edgeID = 0;
+                for(var key in feature ){
+                    var newRow = table.insertRow();
+                    var cell1 = newRow.insertCell();
+                    var cell2 = newRow.insertCell();
+                    cell1.innerHTML = key;
+                    cell2.innerHTML = feature[key];
+                }
+            });
+        });
+
+    }
+</script>
+</body>
+</html>

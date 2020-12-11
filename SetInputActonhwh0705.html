@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <title>0705两种方式的属性查询</title>
+    <link href="./Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <link href="./css/pretty.css" rel="stylesheet">
+    <script src="./js/jquery.min.js"></script>
+    <script src="./js/config.js"></script>
+    <script type="text/javascript" src="./js/require.min.js" data-main="js/main"></script>
+</head>
+<body>
+<div id="cesiumContainer"></div>
+<img id="myimg" src="./images/home_banner.jpg" width="50%" height="auto">
+<h2 id="title"></h2>
+<p id="des" class="word"></p>
+
+<audio controls="controls">
+    <source src="./media/song.mp3" type="audio/mpeg"/>
+    Your browser does not support the audio tag.
+</audio>
+<script type="text/javascript">
+    function onload(Cesium) {
+        // var infoboxContainer = document.getElementById("bubble");
+        //初始化viewer部件
+
+        var viewer = new Cesium.Viewer('cesiumContainer', {
+            infoBox: true,  //自带弹出框hwh
+            // //Bing地图
+            // imageryProvider: new Cesium.BingMapsImageryProvider({
+            //     url: 'https://dev.virtualearth.net',
+            //     key: 'AnGgQ-Iyh9xx1sCL3p9DdFFllIYPvYTSpp_6BD5WYjn1s2DOy5VJ9t_1o1eo3oRx',
+            //     mapStyle: Cesium.BingMapsStyle.AERIAL
+            // }),
+        });
+
+        // viewer.scene.globe.depthTestAgainstTerrain = false;
+        var data = [{
+            "id": "0",
+            "no": "PK10",
+            "longitude": "108.217956",
+            "latitude": "26.133125",
+            "name": "排口10",
+            "type": "其他站",
+            "index": "NH3-N、TP、COD",
+            "ContainCamera": "true"
+        }, {
+            "id": "1",
+            "no": "PK11",
+            "longitude": "108.7845646",
+            "latitude": "26.573506",
+            "name": "排口11",
+            "type": "工业排口水质站",
+            "index": "NH3-N、TP、COD",
+            "ContainCamera": "true"
+        }, {
+            "id": "2",
+            "no": "PK12",
+            "longitude": "108.8919024",
+            "latitude": "26.54617135",
+            "name": "排口12",
+            "type": "工业排口水质站",
+            "index": "NH3-N、TP、COD",
+            "ContainCamera": "true"
+        },]
+
+        viewer.imageryLayers.addImageryProvider(new Cesium.TiandituImageryProvider({
+            credit: new Cesium.Credit('天地图全球影像服务     数据来源：国家地理信息公共服务平台 & 四川省测绘地理信息局'),
+            url: "http://[subdomain].tianditu.com/img_w/wmts?tk=a0e1ab8e059013e9c6f5d5104aa6c868"
+        }));
+
+        // infoBox : false,  //屏蔽自带弹出框hwh
+        // debugger;
+        // viewer.infoBox = false;
+
+        var imageryLayers = viewer.imageryLayers;
+        var labelImagery = new Cesium.TiandituImageryProvider({
+            mapStyle: Cesium.TiandituMapsStyle.CIA_C,//天地图全球中文注记服务（经纬度投影）
+            url: "http://[subdomain].tianditu.com/cia_c/wmts?tk=a0e1ab8e059013e9c6f5d5104aa6c868"
+        });
+        imageryLayers.addImageryProvider(labelImagery);
+
+        // var promise_underground = viewer.scene.open('http://113.240.224.29:8990/iserver/services/3D-sbxDamDemV1-GISDATA/rest/realspace');
+        // var promise_underground2 = viewer.scene.open('http://113.240.224.29:8990/iserver/services/3D-sbxmap/rest/realspace');
+        // var promise_underground2 = viewer.scene.open('http://www.localhost:8090/iserver/services/3D-sbxmap/rest/realspace');
+
+        // var layer = viewer.imageryLayers.addImageryProvider(new Cesium.SuperMapImageryProvider({
+        //     // url: "http://113.240.224.29:8990/iserver/services/map-sbx4/rest/maps/%E7%81%BE%E5%AE%B3%E7%82%B9@GISDATA/layers/%E7%81%BE%E5%AE%B3%E7%82%B9@GISDATA.html"
+        //     url: "http://113.240.224.29:8990/iserver/services/map-sbx16Img/rest/maps/sbxImg@sbx16Img"
+        // }));
+
+        //
+        // var smlayers2 = viewer.imageryLayers.addImageryProvider(new Cesium.SuperMapImageryProvider({
+        //     url: "http://www.localhost:8090/iserver/services/3D-sbxmap/rest/realspace/datas/灾害点@GISDATA_2",
+        // }));
+        // var smlayers = viewer.imageryLayers.addImageryProvider(new Cesium.SuperMapImageryProvider({
+        //     url: "http://www.localhost:8090/iserver/services/3D-sbxmap/rest/realspace/datas/%E5%B1%95%E4%BE%9D%E5%AF%A8v1@GISDATA",
+        // }));
+
+        // var promiseT = Cesium.KmlDataSource.load('./老城片区范围.kml');
+        // var promiseM = Cesium.KmlDataSource.load('./鹰潭中心城区供水线路.kml');
+        viewer.dataSources.add(Cesium.KmlDataSource.load('./data/老城片区范围.kml', {
+            camera: viewer.scene.camera,
+            canvas: viewer.scene.canvas
+        }));
+        // viewer.dataSources.add(Cesium.KmlDataSource.load('./鹰潭中心城区供水线路.kml',{
+        //     camera : viewer.scene.camera,
+        //     canvas : viewer.scene.canvas
+        // }));
+
+        // //添加监测站点
+        for (var i = 0; i < data.length; i++) {
+            viewer.entities.add({
+                id: data[i]["id"],
+                position: Cesium.Cartesian3.fromDegrees(parseFloat(data[i]["longitude"]), parseFloat(data[i]["latitude"]), 30),
+                billboard: {
+                    image: './images/SZ.png',
+                    width: 50,
+                    height: 60,
+                },
+                type: data[i]["id"] + data[i]["type"],//自定义数据
+                label: {
+                    text: data[i]["type"],
+                    font: '16px sans-serif',
+                    fillColor: Cesium.Color.RED,
+                    outlineColor: Cesium.Color.BLACK,
+                    outlineWidth: 2,
+                    horizontalOrigin: Cesium.HorizontalOrigin.LEFT,
+                    pixelOffset: new Cesium.Cartesian2(0.0, -30),
+                },
+            });
+        }
+        //取消双击选中效果
+        //viewer.cesiumWidget.screenSpaceEventHandler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
+
+
+        var handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+        handler.setInputAction(function (click) {
+            var mousePosition = click.position;
+            var pick = viewer.scene.pick(mousePosition, 10, 10);
+            if (typeof (pick) !== "undefined" && typeof (pick.id) !== "undefined") {
+                if (pick.id.id == 1) {
+                    viewer.selectedEntity = null;//禁用自带的infoBox
+                    alert(pick.id.id); //弹窗内容，可以在viewer.entites.add中自定义
+                }
+                console.log(pick.id.id);
+            }
+        }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+
+    }
+</script>
+</body>
+</html>
