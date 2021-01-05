@@ -1,0 +1,38 @@
+  //使用bubblediv样式 
+
+
+/**
+   * 地图展示标牌
+   * topContentName: 标牌第一个元素的内容名
+   * bottomContentName: 标牌第二个元素的内容名
+   * topContent: 标牌第一个元素的内容
+   * bottomContent: 标牌第二个元素的内容
+   * lon: 标牌经度
+   * lat: 标牌维度
+   */
+  mapShowScutcheon(topContentName,topContent,bottomContentName,bottomContent,lon,lat) {
+    css3Renderer.removeEntityLayer('riverGeneralSituationScutcheon');
+    let element = `<div class='bubbleLayer bubbleLayer-box' id='riverGeneralSituationScutcheon'>
+                          <!--<div class='line'></div>-->
+                          <div class='main'>
+                              <div class="watershedArea">${topContentName}：<span>${topContent}</span></div>
+<!--                              <div class="regionPercentage">${bottomContentName}：<span>${bottomContent}</span></div>-->
+                          </div>
+                      </div>`
+    let entityLayer = {
+      id: 'riverGeneralSituationScutcheon',
+      position: [lon, lat, 0],//高度为 boxHeightMax
+      element:element,
+      offset: [-110, -120],
+      boxHeight: 20000,//中间立方体的高度
+      boxHeightDif: 500,//中间立方体的高度增长差值，越大增长越快
+      boxHeightMax: 40000,//中间立方体的最大高度
+      boxSide: 10000,//立方体的边长
+      boxMaterial: Cesium.Color.DEEPSKYBLUE.withAlpha(0.5),
+      circleSize: 30000,//大圆的大小，小圆的大小默认为一半
+      circleInsideImage:circleInside,
+      circleOutImage:circleOut
+    };
+    css3Renderer.append(entityLayer);
+  }
+

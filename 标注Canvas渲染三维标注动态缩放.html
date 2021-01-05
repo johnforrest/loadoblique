@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <title>CBD</title>
+    <link href="./Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <script src="./js/config.js"></script>
+    <link href="./css/pretty.css" rel="stylesheet">
+    <script src="./js/jquery.min.js"></script>
+    <script type="text/javascript" src="./js/require.min.js" data-main="js/main"></script>
+</head>
+<body>
+<div id="cesiumContainer"></div>
+<img style="visibility: hidden;" src='./ysCesium/images/znyDiv.png'/>
+<script type="text/javascript">
+    /*示范代码说明：
+     *选取一个点作为中心点，并以此做旋转
+     *
+     *主要涉及接口：
+         * camera.flyCircle
+         * camera.flyCircleLoop
+         * camera.stopFlyCircle
+         * 示范代码：
+       */
+    function onload(Cesium) {
+        viewer = new Cesium.Viewer('cesiumContainer');
+
+        var scene = viewer.scene;
+        viewer.scene.globe.depthTestAgainstTerrain =false;
+        var widget = viewer.cesiumWidget;
+        try{
+            var img=document.createElement("img"); //用制作好的图片创建img对象
+            // img.src="./ysCesium/images/znyDiv.png";
+            img.src="./images/box.png";
+            var canvas= drawCanvas(img,"徐汇区税务局一所",22,70,60);//调用绘制Canvas的方法
+            var entity=viewer.entities.add({
+                position : Cesium.Cartesian3.fromDegrees(121.42799064,31.19380636,50),
+                billboard :{
+                    image : canvas,
+                    scaleByDistance:new Cesium.NearFarScalar(1000, 1, 100000,0.1),//设置随图缩放距离和比例
+                    distanceDisplayCondition:new Cesium.DistanceDisplayCondition(50, 100000)//设置可见距离
+                }
+            });
+            var canvas1= drawCanvas(img,"黄浦区税务局一所",28,30,90);
+            var entity1=viewer.entities.add({
+                position : Cesium.Cartesian3.fromDegrees(121.47516187,31.20711084,50),
+                billboard :{
+                    image : canvas1,
+                    scaleByDistance:new Cesium.NearFarScalar(1000, 1, 100000,0.1),
+                    distanceDisplayCondition:new Cesium.DistanceDisplayCondition(50, 100000)
+                }
+            });
+            var canvas2= drawCanvas(img,"三分局办税厅",28,60,90);
+            var entity2=viewer.entities.add({
+                position : Cesium.Cartesian3.fromDegrees(121.50272729,31.21522238,50),
+                billboard :{
+                    image : canvas2,
+                    scaleByDistance:new Cesium.NearFarScalar(1000, 1, 100000,0.1),
+                    distanceDisplayCondition:new Cesium.DistanceDisplayCondition(50, 100000)
+                }
+            });
+            viewer.flyTo(entity);
+
+        }
+        catch(e){
+            if (widget._showRenderLoopErrors) {
+                var title = '渲染时发生错误，已停止渲染。';
+                widget.showErrorPanel(title, undefined, e);
+            }
+        }
+
+    }
+    function drawCanvas(img,text,fontsize,tx,ty){
+        var canvas = document.createElement('canvas');      //创建canvas标签
+        var ctx = canvas.getContext('2d');
+
+        ctx.fillStyle = '#99f';
+        ctx.font = fontsize + "px Arial";
+
+        canvas.width = 280;
+        canvas.height = 235;
+
+        ctx.drawImage(img, 0,0,280,235);
+
+        ctx.fillStyle = '#fff';
+        ctx.font = fontsize + "px Calibri,sans-serif";
+        ctx.shadowOffsetX = 1;    //阴影往左边偏，横向位移量
+        ctx.shadowOffsetY = 0;   //阴影往左边偏，纵向位移量
+        //ctx.shadowColor = "#fff"; //阴影颜色
+        ctx.shadowBlur = 1; //阴影的模糊范围
+        ctx.fillText(text, tx, ty);
+        return canvas;
+    }
+</script>
+</body>
+</html>

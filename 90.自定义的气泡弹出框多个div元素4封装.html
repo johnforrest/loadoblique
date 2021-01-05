@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+
+    <link href="./Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <link href="./css/pretty.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/znyDiv.css">
+    <link rel="stylesheet" href="./css/zny2.css">
+    <link rel="stylesheet" href="./css/zny3.css">
+    <script src="./js/jquery.min.js"></script>
+    <script type="text/javascript" src="./js/require.min.js" data-main="js/main"></script>
+    <!--G:\supermapWebgl\examples\ysCesium\css\ysCesium.css-->
+</head>
+<body>
+<!--<div class='ysc-dynamic-layer' id='one'>-->
+<!--<div class='line'></div>-->
+<!--<div class='main'>-->
+<!--</div>-->
+<!--</div>-->
+
+<div id="cesiumContainer"></div>
+<!--</blockquote>-->
+<script type="text/javascript">
+    function onload(Cesium) {
+        // var infoboxContainer = document.getElementById("bubble");
+        //初始化viewer部件
+        var viewer = new Cesium.Viewer('cesiumContainer', {
+            infoBox: true,  //屏蔽自带弹出框hwh
+        });
+
+        let element = `<div class='bubbleLayer bubbleLayer-box' id='box5'>
+                        <!--<div class='line'></div>-->
+                        <div class='main'>
+                            <div class="">测试</div>
+                        </div>
+                    </div>`
+
+
+        let element2 = `<div class='bubbleLayer bubbleLayer-box' id='box2'>
+                        <!--<div class='line'></div>-->
+                        <div class='main'>
+                            <div class="">测试2</div>
+                        </div>
+                    </div>`
+
+
+        let entityLayer = {
+            id: 'box2',
+            position: [113, 28, 40000],//高度为 boxHeightMax
+            element: element,
+            offset: [-25, -120],
+            boxHeight: 20000,//中间立方体的高度
+            boxHeightDif: 500,//中间立方体的高度增长差值，越大增长越快
+            boxHeightMax: 40000,//中间立方体的最大高度
+            boxSide: 10000,//立方体的边长
+            boxMaterial: Cesium.Color.DEEPSKYBLUE.withAlpha(0.5),
+            circleSize: 30000,//大圆的大小，小圆的大小默认为一半
+            circleInsideImage: "./images/circle1.png",
+            circleOutImage: "./images/circle2.png",
+            showEntity: true
+        };
+
+        let entityLayer2 = {
+            id: 'box5',
+            position: [112, 28, 40000],//高度为 boxHeightMax
+            element: element2,
+            offset: [-25, -120],
+            boxHeight: 20000,//中间立方体的高度
+            boxHeightDif: 500,//中间立方体的高度增长差值，越大增长越快
+            boxHeightMax: 40000,//中间立方体的最大高度
+            boxSide: 10000,//立方体的边长
+            boxMaterial: Cesium.Color.DEEPSKYBLUE.withAlpha(0.5),
+            circleSize: 30000,//大圆的大小，小圆的大小默认为一半
+            circleInsideImage: "./images/circle1.png",
+            circleOutImage: "./images/circle2.png",
+            showEntity: true
+        };
+
+        let css3Elements = [];
+        const css3Renderer = new Css3Renderer(css3Elements, true);
+
+        css3Renderer.addEntityLayer(entityLayer);
+        css3Renderer.addEntityLayer(entityLayer2);
+
+        function Css3Renderer(elements, isBackHide) {
+            const scratch = new Cesium.Cartesian2();
+            const scene = viewer.scene;
+            const camera = viewer.camera;
+            const that = this;
+            that.container = null;
+            that.elements = elements;
+            that.isBackHide = isBackHide;
+            this.__proto__.init = function () {
+                const container = document.createElement('div')
+                container.className = `ys-css3-container`
+                document.body.appendChild(container)
+                that.container = container;
+                that.elements.forEach(e => {
+                    container.insertAdjacentHTML('beforeend', e.element);
+                });
+                scene.preRender.addEventListener(function () {
+                    for (let i = 0; i < container.children.length; i++) {
+                        const p = Cesium.Cartesian3.fromDegrees(that.elements[i].position[0], that.elements[i].position[1], that.elements[i].position[2] || 0)
+                        const canvasPosition = scene.cartesianToCanvasCoordinates(p, scratch)
+                        if (Cesium.defined(canvasPosition)) {
+                            container.children[i].style.left = parseFloat(canvasPosition.x) + parseFloat(that.elements[i].offset[0]) + 'px'
+                            container.children[i].style.top = parseFloat(canvasPosition.y) + parseFloat(that.elements[i].offset[1]) + 'px'
+                            if (that.isBackHide) {
+                                let j = camera.position, n = scene.globe.ellipsoid.cartesianToCartographic(j).height;
+                                if (!(n += 1 * scene.globe.ellipsoid.maximumRadius, Cesium.Cartesian3.distance(j, p) > n)) {
+                                    container.children[i].style.display = 'block'
+                                } else {
+                                    container.children[i].style.display = 'none'
+                                }
+                            }
+                        }
+                    }
+                })
+            };
+            this.__proto__.remove = function (id) {
+                that.elements = that.elements.filter(e => e.id !== id);
+                if (document.getElementById(id)) {
+                    let dom = document.getElementById(id);
+                    if (dom) {
+                        that.container.removeChild(dom);
+                    }
+                }
+            };
+            this.__proto__.append = function (object) {
+                that.elements.push(object);
+                that.container.insertAdjacentHTML('beforeend', object.element)
+            };
+            this.__proto__.removeEntityLayer = function (id) {
+                viewer.entities.removeById(id + "_1");
+                viewer.entities.removeById(id + "_2");
+                viewer.entities.removeById(id + "_3");
+                that.remove(id)
+            };
+            this.__proto__.addEntityLayer = function (object) {
+                let lon = object.position[0],
+                    lat = object.position[1],
+                    sStartFlog = false,
+                    that = this,
+                    s1 = 0.001,
+                    s2 = s1,
+                    s3 = s1,
+                    s4 = s1;
+                setTimeout(() => sStartFlog = true, 300);
+                let rotation = Cesium.Math.toRadians(30);
+                let rotation2 = Cesium.Math.toRadians(30);
+
+                //构建entity
+                let height = object.boxHeight, heightMax = object.boxHeightMax, heightDif = object.boxHeightDif;
+                let goflog = true;
+
+
+                //添加正方体
+                viewer.entities.add({
+                    id: object.id + "_1",
+                    name: "立方体盒子",
+                    position: new Cesium.CallbackProperty(function () {
+                        height = height + heightDif;
+                        if (height >= heightMax) {
+                            height = heightMax
+                        }
+                        return Cesium.Cartesian3.fromDegrees(lon, lat, height / 2)
+                    }, false),
+                    box: {
+                        dimensions: new Cesium.CallbackProperty(function () {
+                            height = height + heightDif
+                            if (height >= heightMax) {
+                                height = heightMax
+                                if (goflog) { //需要增加判断 不然它会一直执行; 导致对div的dom操作 会一直重复
+                                    goflog = false
+                                    that.append(object, true)
+                                }
+                            }
+                            return new Cesium.Cartesian3(object.boxSide, object.boxSide, height)
+                        }, false),
+                        material: object.boxMaterial
+                    }
+                });
+                //添加底座一 外环
+                viewer.entities.add({
+                    id: object.id + "_2",
+                    name: "椭圆",
+                    position: Cesium.Cartesian3.fromDegrees(lon, lat),
+                    ellipse: {
+                        // semiMinorAxis : object.circleSize, //直接这个大小 会有一个闪白的材质 因为cesium材质默认是白色 所以我们先将大小设置为0
+                        // semiMajorAxis : object.circleSize,
+                        semiMinorAxis: new Cesium.CallbackProperty(function () {
+                            if (sStartFlog) {
+                                s1 = s1 + object.circleSize / 20;
+                                if (s1 >= object.circleSize) {
+                                    s1 = object.circleSize;
+                                }
+                            }
+                            return s1;
+                        }, false),
+                        semiMajorAxis: new Cesium.CallbackProperty(function () {
+                            if (sStartFlog) {
+                                s2 = s2 + object.circleSize / 20;
+                                if (s2 >= object.circleSize) {
+                                    s2 = object.circleSize
+                                }
+                            }
+                            return s2;
+                        }, false),
+                        material: object.circleOutImage,
+                        rotation: new Cesium.CallbackProperty(function () {
+                            rotation += 0.05;
+                            return rotation;
+                        }, false),
+                        stRotation: new Cesium.CallbackProperty(function () {
+                            rotation += 0.05;
+                            return rotation;
+                        }, false),
+                        zIndex: 2,
+                    }
+                });
+                //添加底座二 内环
+                viewer.entities.add({
+                    id: object.id + "_3",
+                    name: "椭圆",
+                    position: Cesium.Cartesian3.fromDegrees(lon, lat),
+                    ellipse: {
+                        semiMinorAxis: new Cesium.CallbackProperty(function () {
+                            if (sStartFlog) {
+                                s3 = s3 + object.circleSize / 20;
+                                if (s3 >= object.circleSize / 2) {
+                                    s3 = object.circleSize / 2;
+                                }
+                            }
+                            return s3;
+                        }, false),
+                        semiMajorAxis: new Cesium.CallbackProperty(function () {
+                            if (sStartFlog) {
+                                s4 = s4 + object.circleSize / 20;
+                                if (s4 >= object.circleSize / 2) {
+                                    s4 = object.circleSize / 2;
+                                }
+                            }
+                            return s4;
+                        }, false),
+                        material: object.circleInsideImage,
+                        rotation: new Cesium.CallbackProperty(function () {
+                            rotation2 -= 0.03
+                            return rotation2
+                        }, false),
+                        stRotation: new Cesium.CallbackProperty(function () {
+                            rotation2 -= 0.03
+                            return rotation2
+                        }, false),
+                        zIndex: 3
+                    }
+                })
+            };
+            this.init()
+        }
+
+
+        let element3 = `<div class='bubbleLayer2 bubbleLayer2-box' id='box3'>
+                            <div class='line'></div>
+                            <div class='main'>
+                                <div class="">测试</div>
+                                <div class="">测试</div>
+                            </div>
+                        </div>`
+
+        let entityLayer3 = {
+            id: 'box3',
+            position: [114, 27, 40000],//高度为 boxHeightMax
+            element: element3,
+            offset: [-110, -120],
+            boxHeight: 20000,//中间立方体的高度
+            boxHeightDif: 500,//中间立方体的高度增长差值，越大增长越快
+            boxHeightMax: 40000,//中间立方体的最大高度
+            boxSide: 10000,//立方体的边长
+            boxMaterial: Cesium.Color.DEEPSKYBLUE.withAlpha(0.5),
+            circleSize: 30000,//大圆的大小，小圆的大小默认为一半
+            circleInsideImage: "./images/circle1.png",
+            circleOutImage: "./images/circle2.png",
+        };
+        css3Renderer.addEntityLayer(entityLayer3);
+
+
+        let element4 = `<div class='bubbleLayer2 bubbleLayer2-box' id='box6'>
+                            <div class='line'></div>
+                            <div class='main'>
+                                <div class="">测试不带柱状体</div>
+                                <div class="">测试</div>
+                            </div>
+                        </div>`
+        let entityLayer4 = {
+            id: 'box6',
+            position: [114, 25, 0],//高度为 boxHeightMax
+            element: element4,
+            offset: [-110, -120],
+            boxHeight: 20000,//中间立方体的高度
+            boxHeightDif: 500,//中间立方体的高度增长差值，越大增长越快
+            boxHeightMax: 40000,//中间立方体的最大高度
+            boxSide: 10000,//立方体的边长
+            boxMaterial: Cesium.Color.DEEPSKYBLUE.withAlpha(0.5),
+            circleSize: 30000,//大圆的大小，小圆的大小默认为一半
+            circleInsideImage: "./images/circle1.png",
+            circleOutImage: "./images/circle2.png",
+            showEntity: true
+        };
+        css3Renderer.append(entityLayer4);
+
+
+        let element5 = `<div class='bubbleLayer3 bubbleLayer3-box' id='box7'>
+                            <div class='main'>
+                                <div class="">长度：200km</div>
+                                <div class="">湖南境内：198km</div>
+                            </div>
+                        </div>`
+        let entityLayer5 = {
+            id: 'box7',
+            position: [112, 25, 0],//高度为 boxHeightMax
+            element: element5,
+            offset: [-110, -120],
+            boxHeight: 20000,//中间立方体的高度
+            boxHeightDif: 500,//中间立方体的高度增长差值，越大增长越快
+            boxHeightMax: 40000,//中间立方体的最大高度
+            boxSide: 10000,//立方体的边长
+            boxMaterial: Cesium.Color.DEEPSKYBLUE.withAlpha(0.5),
+            circleSize: 30000,//大圆的大小，小圆的大小默认为一半
+            circleInsideImage: "./images/circle1.png",
+            circleOutImage: "./images/circle2.png",
+            showEntity: true
+        };
+        css3Renderer.append(entityLayer5);
+
+
+        setTimeout(() => {
+            viewer.zoomTo(viewer.entities)
+        }, 500);
+
+        setTimeout(() => {
+                /*                css3Renderer.removeEntityLayer('box2');
+                                css3Renderer.removeEntityLayer('box5');
+                                css3Renderer.removeEntityLayer('box3');
+                                css3Renderer.removeEntityLayer('box6');*/
+            }
+            , 10000);
+    }
+</script>
+</body>
+</html>
