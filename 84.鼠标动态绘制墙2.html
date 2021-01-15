@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <title>属性查询</title>
+
+    <link href="./Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+<!--    <link href="./css/bootstrap.min.css" rel="stylesheet">-->
+    <link href="./css/pretty.css" rel="stylesheet">
+    <script src="./js/jquery.min.js"></script>
+    <script src="./js/bootstrap.min.js"></script>
+<!--    <script src="./js/bootstrap-select.min.js"></script>-->
+    <script src="./js/tooltip.js"></script>
+    <script src="./js/config.js"></script>
+    <script type="text/javascript" src="./Build/Cesium/Cesium.js"></script>
+</head>
+<body>
+<div id="cesiumContainer"></div>
+<div id="bubble"></div>
+
+<script type="text/javascript">
+    function onload(Cesium) {
+        try {
+            // var infoboxContainer = document.getElementById("bubble");
+            //初始化viewer部件
+            var viewer = new Cesium.Viewer('cesiumContainer', {
+                orderIndependentTranslucency: false, contextOptions: {webgl: {alpha: true,}},
+            });
+            // viewer.customInfobox = infoboxContainer;
+            var scene = viewer.scene;
+            viewer.entities.removeAll();
+            viewer.scene.globe.depthTestAgainstTerrain = true;
+
+            let handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+            let positions;
+            let num = 0;
+
+            let wallEntity = viewer.entities.add(new Cesium.Entity({
+                wall: {
+                    // positions:[],
+                    positions: new Cesium.CallbackProperty(function () {
+                        if (num != 0 && positions) {
+                            return new Cesium.Cartesian3.fromDegreesArrayHeights(positions);
+                        } else {
+                            return [];
+                        }
+                    }, false),
+                    material: Cesium.Color.YELLOW
+                }
+            }));
+            viewer.zoomTo(wallEntity);
+
+
+            let longitude;
+            let latitud;
+            let height;
+
+            handler.setInputAction(function (e) {
+                num = 1;
+                let position = scene.pickPosition(e.position);            //将笛卡尔坐标转化为经纬度坐标
+                let cartographic = Cesium.Cartographic.fromCartesian(position);
+                longitude = Cesium.Math.toDegrees(cartographic.longitude);
+                latitud = Cesium.Math.toDegrees(cartographic.latitude);
+            }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+            handler.setInputAction(function (e) {
+                let position = viewer.scene.pickPosition(e.endPosition);            //将笛卡尔坐标转化为经纬度坐标
+                if (position) {
+                    let cartographic = Cesium.Cartographic.fromCartesian(position);
+                    let longitude2 = Cesium.Math.toDegrees(cartographic.longitude);
+                    let latitude2 = Cesium.Math.toDegrees(cartographic.latitude);
+                    if (num == 1) {
+                        positions = [longitude, latitud, 100000, longitude2, latitude2, 100000];
+                        // wallEntity.wall.positions = Cesium.Cartesian3.fromDegreesArrayHeights(positions);
+                    }
+                }
+            }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+
+
+            handler.setInputAction(function (movement) {
+                handler.destroy();
+            }, Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
+
+        } catch (e) {
+            console.log("报错",e)
+        }
+
+    }
+
+    if (typeof Cesium !== 'undefined') {
+        window.startupCalled = true;
+        onload(Cesium);
+    }
+</script>
+</body>
+</html>

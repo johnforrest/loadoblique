@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <title>属性查询</title>
+    <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <link href="./css/pretty.css" rel="stylesheet">
+    <script src="./js/jquery.min.js"></script>
+    <script src="./js/config.js"></script>
+    <script type="text/javascript" src="./js/require.min.js" data-main="js/main"></script>
+</head>
+<body>
+<div id="cesiumContainer"></div>
+
+<img id = "test" src="SWGP.png">
+<!--<img id = "test" src="./znyImage/xzq2X.png">-->
+
+<script type="text/javascript">
+    function onload(Cesium) {
+        var infoboxContainer = document.getElementById("bubble");
+        //初始化viewer部件
+        var viewer = new Cesium.Viewer('cesiumContainer', {});
+        var blueBox = viewer.entities.add({
+            name : 'Blue box',
+            position: new  Cesium.Cartesian3.fromDegrees(100.0, 30.0, 300.0),
+            box : {
+                dimensions : new Cesium.Cartesian3(40000.0, 30000.0, 50000.0),
+                // material : Cesium.Color.BLUE,
+                material : new Cesium.ColorMaterialProperty(
+                    new Cesium.CallbackProperty(function() {
+                        return Cesium.Color.fromRandom({
+                            minimumRed : 0,
+                            minimumGreen : 0,
+                            minimumBlue : 0,
+                            alpha : 1.0
+                        });
+                    }, false)),
+                outline: true,
+            },
+        });
+
+        // var colorProperty = new Cesium.SampledProperty(Cesium.Color);
+        // colorProperty.addSample(Cesium.JulianDate.fromIso8601('2019-01-01T00:00:00.00Z'),
+        //     new Cesium.Color(0, 1, 0));
+        // colorProperty.addSample(Cesium.JulianDate.fromIso8601('2019-01-03T00:00:00.00Z'),
+        //     new Cesium.Color(0, 0, 1));
+        // colorProperty.addSample(Cesium.JulianDate.fromIso8601('2019-01-05T00:00:00.00Z'),
+        //     new Cesium.Color(255, 1, 0));
+        // colorProperty.addSample(Cesium.JulianDate.fromIso8601('2019-01-07T00:00:00.00Z'),
+        //     new Cesium.Color(0, 255, 0));
+        // blueBox.box.material = new Cesium.ColorMaterialProperty(colorProperty);
+        //
+
+
+
+    }
+</script>
+</body>
+</html>
